@@ -1,0 +1,24 @@
+
+#kubectl apply -f deployment.yaml
+# all the yaml file start from top to bottom and left to right
+#we know that kubectl interact with kubernets using an api
+apiVersion: apps/v1 #this will invoke the apps/v1 api
+kind: Deployment #which api Deployment api it will invoke
+metadata:
+  name: myapp3-deployment #and create and deployment with this name
+spec:
+  replicas: 3 #replicacount as 3 inside this deployment it will create three pod
+  selector:
+    matchLabels:
+      app: myapp3
+  template:
+    metadata:
+      name: myapp3-pod 
+      labels:
+        app: myapp3
+    spec:
+      containers:
+        - name: myapp3-container
+          image: stacksimplify/kubenginx:1.0.0
+          ports:
+            - containerPort: 80 #this will be expose internally inside your k8s cluster

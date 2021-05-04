@@ -1,0 +1,42 @@
+#kubectl apply -f deployment.yaml
+# all the yaml file start from top to bottom and left to right
+#we know that kubectl interact with kubernets using an api
+apiVersion: apps/v1 #this will invoke the apps/v1 api
+kind: Deployment #which api Deployment api it will invoke
+metadata:
+  name: mysql #and create and deployment with this name
+spec:
+  replicas: 1 #replicacount as 3 inside this deployment it will create three pod
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql 
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.6
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-sql-db-password
+                  key: db-password
+          ports:
+            - containerPort: 3306 #this will be expose internally inside your k8s cluster
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql #inside your container the path where your mysql data is stored  
+            - name: usermanagement-dbcreation-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: task-pv-claim
+        - name: usermanagement-dbcreation-script
+          configMap:
+              name: usermanagement-dbcreation-script
